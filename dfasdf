@@ -1,0 +1,76 @@
+ `Gnuplot` is a portable command-line driven graphing utility for Linux, OS/2,
+ MS Windows, OSX, VMS, and many other platforms. The source code is copyrighted
+ but freely distributed (i.e., you don't have to pay for it). It was originally
+ created to allow scientists and students to visualize mathematical functions
+ and data interactively, but has grown to support many non-interactive uses
+ such as web scripting. It is also used as a plotting engine by third-party
+ applications like Octave. Gnuplot has been supported and under active
+ development since 1986. 
+
+ Gnuplot supports many types of plots in either 2D and 3D. It can draw using
+ lines, points, boxes, contours, vector fields, surfaces, and various
+ associated text. It also supports various specialized plot types.
+
+ Gnuplot supports many different types of output: interactive screen terminals
+ (with mouse and hotkey input), direct output to pen plotters or modern
+ printers, and output to many file formats (eps, emf, fig, jpeg, LaTeX, pdf, png,
+ postscript, ...). Gnuplot is easily extensible to include new output modes.
+ Recent additions include interactive terminals based on wxWidgets (usable
+ on multiple platforms), and Qt.  Mouseable plots embedded in web pages
+ can be generated using the svg or HTML5 canvas terminal drivers.
+
+ The command language of `gnuplot` is case sensitive, i.e. commands and
+ function names written in lowercase are not the same as those written in
+ capitals. All command names may be abbreviated as long as the abbreviation is
+ not ambiguous. Any number of commands may appear on a line, separated by
+ semicolons (;). Strings may be set off by either single or double quotes,
+ although there are some subtle differences.  See `syntax` and `quotes` for
+ more details. Example:
+
+       set title "My First Plot";  plot 'data';  print "all done!"
+
+ Commands may extend over several input lines by ending each line but the last
+ with a backslash (\).  The backslash must be the _last_ character on each
+ line.  The effect is as if the backslash and newline were not there.  That
+ is, no white space is implied, nor is a comment terminated.  Therefore,
+ commenting out a continued line comments out the entire command
+ (see `comments`).  But note that if an error occurs somewhere on a multi-line
+ command, the parser may not be able to locate precisely where the error is
+ and in that case will not necessarily point to the correct line.
+
+ In this document, curly braces ({}) denote optional arguments and a vertical
+ bar (|) separates mutually exclusive choices.  `Gnuplot` keywords or `help`
+ topics are indicated by backquotes or `boldface` (where available).  Angle
+ brackets (<>) are used to mark replaceable tokens.  In many cases, a default
+ value of the token will be taken for optional arguments if the token is
+ omitted, but these cases are not always denoted with braces around the angle
+ brackets.
+
+ For built-in help on any topic, type `help` followed by the name of the topic
+ or `help ?` to get a menu of available topics.
+
+ A large set of demo plots is available on the web page
+           http://www.gnuplot.info/demo/
+ When run from command line, gnuplot is invoked using the syntax
+       gnuplot {OPTIONS} file1 file2 ...
+ where file1, file2, etc. are input file as in the `load` command.
+ On X11-based systems, you can use
+       gnuplot {X11OPTIONS} {OPTIONS} file1 file2 ...
+ see your X11 documentation and `x11` in this document.
+
+ Options interpreted by gnuplot may come anywhere on the line.  Files are
+ executed in the order specified, as are commands supplied by the -e option,
+ for example
+       gnuplot   file1.in   -e "reset"   file2.in
+
+ The special filename "-" is used to force reading from stdin.  `Gnuplot` exits
+ after the last file is processed.  If no load files are named, `Gnuplot` takes
+ interactive input from stdin.  See help `batch/interactive` for more details.
+ The options specific to gnuplot can be listed by typing
+       gnuplot --help
+ See `command line options` for more details.
+
+ In sessions with an interactive plot window you can hit 'h' anywhere on the
+ plot for help about `hotkeys` and `mousing` features.
+ Section `seeking-assistance` will help you to find further information, help
+ and FAQ.

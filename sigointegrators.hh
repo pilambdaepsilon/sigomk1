@@ -2,9 +2,8 @@
 
 double Int_rhoS(double kmin, double kmax, int calls){
 	gsl_function RhoScalar;
-	struct arg_params Rhoparams = {mass};
 	RhoScalar.function = &rhoS;
-	RhoScalar.params = &Rhoparams;
+	RhoScalar.params = &mstar;
 
 	gsl_integration_workspace *WR = gsl_integration_workspace_alloc(calls);
 	double relerr=1e-7;
@@ -20,10 +19,9 @@ double Int_rhoS(double kmin, double kmax, int calls){
 
 double Int_Ekinetic(double kmin, double kmax, int calls){
 	gsl_function EK;
-	struct arg_params EParams = {mass};
 
 	EK.function = &goko;
-	EK.params = &EParams;
+	EK.params = &mstar;
 
 	gsl_integration_workspace * WE = gsl_integration_workspace_alloc(calls);
 	double relerr0 = 1e-7;
@@ -35,5 +33,40 @@ double Int_Ekinetic(double kmin, double kmax, int calls){
 	gsl_integration_workspace_free(WE);
 	
 	return EKin;
+}
+double Int_eye1(double kmin, double kmax, int calls){
+	gsl_function EYE1;
+
+	EYE1.function = &I1;
+	EYE1.params = &mstar;
+
+	gsl_integration_workspace * WEYE = gsl_integration_workspace_alloc(calls);
+	double relerr0 = 1e-7;
+
+	double Ione = 0;
+	double Ioneerr = 0;
+
+	gsl_integration_qags(&EYE1, kmin, kmax, 0., relerr0, calls, WEYE, &Ione, &Ioneerr);
+	gsl_integration_workspace_free(WEYE);
+	
+	return Ione;
+}
+
+double Int_eye2(double kmin, double kmax, int calls){
+	gsl_function EYE2;
+
+	EYE2.function = &I2;
+	EYE2.params = &mstar;
+
+	gsl_integration_workspace * WEYE = gsl_integration_workspace_alloc(calls);
+	double relerr0 = 1e-7;
+
+	double Itwo = 0;
+	double Itwoerr = 0;
+
+	gsl_integration_qags(&EYE2, kmin, kmax, 0., relerr0, calls, WEYE, &Itwo, &Itwoerr);
+	gsl_integration_workspace_free(WEYE);
+	
+	return Itwo;
 }
 

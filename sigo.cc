@@ -1,73 +1,71 @@
 #include "sigointegrators.hh"
 
 int main(){
-	double ScalarDensity = 0;
-	double BaryonDensity = 0;
-	double KineticEnergy = 0;
-	double EnergyDensity = 0;
-	double E0 = 0;
-	ofstream DAT;
+	double ScalarDensity, KineticEnergy, EnergyDensity, Int1, Int2, Int3;			
+	double E0 = 0;	
+	double BaryonDensity = 0;				//the one true var
+	double ConstC, ConstB, GSIGMA, GOMEGA, GRHO;
+	ofstream DAT;						//my file
 	DAT.open("SigOm.dat");
-	ScalarDensity = Int_rhoS(0, kFermi, 1000);
-	KineticEnergy = Int_Ekinetic(0, kFermi, 1000);
 
-/*****
-       /$$           /$$                                     /$$                    
-      | $$          | $$                                    |__/                    
-  /$$$$$$$  /$$$$$$ | $$$$$$$  /$$   /$$  /$$$$$$   /$$$$$$  /$$ /$$$$$$$   /$$$$$$ 
- /$$__  $$ /$$__  $$| $$__  $$| $$  | $$ /$$__  $$ /$$__  $$| $$| $$__  $$ /$$__  $$
-| $$  | $$| $$$$$$$$| $$  \ $$| $$  | $$| $$  \ $$| $$  \ $$| $$| $$  \ $$| $$  \ $$
-| $$  | $$| $$_____/| $$  | $$| $$  | $$| $$  | $$| $$  | $$| $$| $$  | $$| $$  | $$
-|  $$$$$$$|  $$$$$$$| $$$$$$$/|  $$$$$$/|  $$$$$$$|  $$$$$$$| $$| $$  | $$|  $$$$$$$
- \_______/ \_______/|_______/  \______/  \____  $$ \____  $$|__/|__/  |__/ \____  $$
-                                         /$$  \ $$ /$$  \ $$               /$$  \ $$
-                                        |  $$$$$$/|  $$$$$$/              |  $$$$$$/
-                                         \______/  \______/                \______/ 	****/
-
-
-	double Ssig = 0;
-	double ctest = 0;
-	double btest = 0;
-	cout << "Field Strength: "; cin >> Ssig;
-	cout << "c: "; cin >> ctest;
-	cout << "b: "; cin >> btest;
-	
-	double ratio = 1/Ssig + 3*pow((mass - mstar),2)*ctest + 2*pow((mass-mstar),2)*btest;
-	double ratio2 = del1(rho0)/alpha1(rho0);
-	double eta = 6*pow(kFermi, 3)/(pi*pi) * mstar*mstar/(mstar*mstar + kFermi2);
-
-	double Alf = (-I1 - 1/Ssig - 3*pow((mass - mstar),2)*ctest - 2*pow((mass-mstar),2)*btest);
- 
-	
-	cout << '\n' << "exp ratio: " << ratio << "   ac ratio: " << ratio2 << '\n';
-	cout << "alpha1: " << alpha1(rho0) << '\n';
-	cout << "delta1: " << del1(rho0) << '\n';
-	cout << "Alf: " << Alf << '\n';
-	cout << "I1: " << I1 << '\n';
-
-
-/*======================================================================================================*/
-
+	double drho = 0.01*rho0;
+	double Etest = 0;
+	double kFermi = 0;
+	double kFermi2 = 0;
+/*========== now use these to get the variable parameters ==================*/	
 	while (BaryonDensity <= 10*rho0){
-		EnergyDensity = 0;
-			
-		EnergyDensity = 0.5 * Gsigma2(BaryonDensity) * pow(ScalarDensity,2);
-		EnergyDensity += 0.5 * Gomega2(BaryonDensity) * pow(BaryonDensity,2);
-		EnergyDensity += 0.5 * Grho2(BaryonDensity) * pow(BaryonDensity,2);
-		EnergyDensity += KineticEnergy;
-		EnergyDensity += 0.3*B(BaryonDensity)*mass* pow(Gsigma2(BaryonDensity), 3)*pow(ScalarDensity, 3);
-		EnergyDensity += 0.25*C(BaryonDensity) * pow(Gsigma2(BaryonDensity), 4)*pow(ScalarDensity,4);
+		kFermi = pow((6*pi*pi/4 *BaryonDensity), 0.3333333);
+		ScalarDensity = Int_rhoS(0, kFermi, 1000);
+		KineticEnergy = Int_Ekinetic(0, kFermi, 1000);
+		Int1 = Int_eye1(0, kFermi, 1000);
+		Int2 = Int_eye2(0, kFermi, 1000);
+		Int3 = KineticEnergy;
 
-//		if(BaryonDensity == 0.){
-//			EnergyDensity = 208.18*MeVtoinvFM;
-//		}
-		if(BaryonDensity == rho0){
-			cout << '\n' << "rho/rho0: " << BaryonDensity/rho0 << '\n' << "EnergyDensity: " << EnergyDensity/MeVtoinvFM - 208.18<< '\n' << "Sigma: " << Gsigma2(BaryonDensity)<< '\n' << "Omega: " << Gomega2(BaryonDensity)<< '\n' << "Rho: " << Grho2(BaryonDensity)<< '\n' << "b: " << B(BaryonDensity)<< '\n' << "c: " << C(BaryonDensity) << '\n' << '\n';
-		}
-		//208.18
-		DAT << BaryonDensity/rho0 << " " << EnergyDensity/BaryonDensity << '\n';
+		ConstC = B(BaryonDensity, Int1, Int2, Int3, kFermi);
+		ConstB = C(BaryonDensity, Int1, Int2, Int3, kFermi);
+		GSIGMA = Gsigma2(BaryonDensity, ConstB, ConstC, Int1, kFermi);
+		GOMEGA = Gomega2(BaryonDensity, kFermi);
+		GRHO = Grho2(BaryonDensity, kFermi);
+		EnergyDensity = 0;
 		
-		BaryonDensity += rho0*0.25;
+//		EnergyDensity += 0.5 * GSIGMA * pow(ScalarDensity,2);
+//		EnergyDensity += 0.5 * GOMEGA * pow(BaryonDensity,2);
+//		EnergyDensity += 0.5 * GRHO * pow(BaryonDensity,2);
+		EnergyDensity += KineticEnergy;
+//		EnergyDensity += 0.3333* ConstB*mass* pow(GSIGMA, 3)*pow(ScalarDensity, 3);
+//		EnergyDensity += 0.25* ConstC * pow(GSIGMA, 4)*pow(ScalarDensity,4);
+
+		Etest = 3*kFermi*kFermi/(10*mass);
+//		Etest +=0.5*(GOMEGA - GSIGMA)*BaryonDensity;
+//		Etest += GSIGMA*BaryonDensity/mass *(3*pow(kFermi, 3)/(10*mass));
+
+		if (BaryonDensity/rho0 < 1.01 && BaryonDensity/rho0 > 0.99){
+			cout << 
+			"r/ro: " << BaryonDensity/rho0<< '\n' << 
+			"E: " << (EnergyDensity/BaryonDensity/MeVtoinvFM)  << '\n' << 
+			"Etest: " << Etest/MeVtoinvFM << '\n' <<
+			"sig: " << GSIGMA << '\n' <<
+			"om: " << GOMEGA << '\n' <<
+			"rho: " << GRHO << '\n' << 
+			"b: " << B(BaryonDensity, Int1, Int2, Int3, kFermi) << '\n' << 
+			"c: " << C(BaryonDensity, Int1, Int2, Int3, kFermi) << '\n' << 
+			"b2: " << B2(BaryonDensity, Int1, Int2, Int3, kFermi) << '\n' << 
+			"c2: " << C2(BaryonDensity, Int1, Int2, Int3, kFermi) << '\n' << '\n';
+		}
+
+		DAT << 
+		BaryonDensity/rho0<< " " << 
+		(EnergyDensity)  << " " << 
+		Etest << " " <<
+		GSIGMA << " " <<
+		GOMEGA << " " <<
+		GRHO << " " <<
+		ConstB << " " <<
+		ConstC << " " <<
+		ScalarDensity << " " << 
+		kFermi << '\n'; 
+		
+		BaryonDensity += drho;
 	}
 
 	DAT.close();
