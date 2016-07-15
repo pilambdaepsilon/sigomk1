@@ -37,7 +37,7 @@ double alpha1(double RHO, double kF){
 	return a1;
 }
 double beta1(double RHO, double kF){
-	double b1 = 2*mass*(mass - mstar)*alpha1(RHO,kF);	
+	double b1 = 2*mass*pow((mass - mstar),2)*alpha1(RHO,kF);	
 	return b1;
 }
 double gamma1(double RHO, double kF){

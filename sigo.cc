@@ -14,11 +14,14 @@ int main(){
 	double kFermi2 = 0;
 	double SRtest = 0;
 	double ScalarDensity = 0;
+	double NeutronDensity = 0;
+	double ProtonDensity = 0;
+	double BetaRatio = 0;
 	double DelMass = 0;
 	double E01 = mass/MeVtoinvFM;
 	double E02 = mass/MeVtoinvFM;
-	double supress = 0;
-	cout << "supress rho: "; cin >> supress; cout << '\n';
+	cout << "Beta Ratio (Neutron Density - Proton Density)/Total Density: "; cin >> BetaRatio; cout << '\n';
+
 /*========== now use these to get the variable parameters ==================*/	
 	while (BaryonDensity <= 10*rho0){
 		kFermi = pow((6*pi*pi/4 *BaryonDensity), (1./3));
@@ -37,28 +40,33 @@ int main(){
 		ScalarDensity = Int_rhoS(0, kFermi, 1000);
 		DelMass = mass - mstar;
 		GRHO = Grho2(BaryonDensity, kFermi);
+
+		NeutronDensity = 0.5*(1+BetaRatio)*BaryonDensity;
+		ProtonDensity = 0.5*(1 - BetaRatio)*BaryonDensity;
 	
 		EnergyDensity = 0.5*(GOMEGA)* BaryonDensity - 0.5*(GSIGMA)*pow(ScalarDensity, 2)/BaryonDensity + KineticEnergy/BaryonDensity - (1./3)*ConstB*mass*pow((mass-mstar), 3)/BaryonDensity - (1./4) * ConstC*pow(DelMass, 4)/BaryonDensity
-		+ 0.5*GRHO*BaryonDensity*supress; 
+		+ 0.5*GRHO*pow((ProtonDensity - NeutronDensity), 2)/BaryonDensity; 
 		Etest = 0.5*(GOMEGA)* BaryonDensity - 0.5*(GSIGMA)*pow(SRtest, 2)/BaryonDensity + KineticEnergy/BaryonDensity - 0.3333*ConstB*mass*pow((mass-mstar), 3)/BaryonDensity - 0.25 * ConstC*pow(DelMass, 4)/BaryonDensity
-	+ 0.5*GRHO*BaryonDensity*supress;
+	+ 0.5*GRHO*pow((ProtonDensity - NeutronDensity), 2)/BaryonDensity;
 
-		if (BaryonDensity < 0.02 && BaryonDensity > 0.0){
+		if (BaryonDensity <= 0.01 && BaryonDensity > 0.0){
 			E01 = EnergyDensity/MeVtoinvFM;
 			E02 = Etest/MeVtoinvFM;
+			cout << "ZERO ZERO ZERO" << '\n';
 		}
 	
 		DAT << 
-		BaryonDensity/rho0<< " " << 
+		BaryonDensity<< " " << 
 		(EnergyDensity)/MeVtoinvFM - E01 << " " << 
 		(Etest)/MeVtoinvFM - E02<< " " <<
 		-GSIGMA << " " <<
 		GOMEGA << " " <<
 		GRHO << " " <<
-//		ConstB << " " <<
-//		ConstC << " " <<
-		GSIGMA*ScalarDensity*ScalarDensity<< " " << 
-		Int3 << " " << '\n';
+		GSIGMA*ScalarDensity<< " " << 
+		NeutronDensity << " " << 
+		ProtonDensity << " " << '\n';
+		
+		
 		if (BaryonDensity < 1.01*rho0 && BaryonDensity > 0.99*rho0){
 			cout << 
 			"r/ro: " << BaryonDensity/rho0<< '\n' << 
