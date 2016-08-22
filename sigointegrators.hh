@@ -1,9 +1,9 @@
 #include "sigofunctions.hh"
 
-double Int_rhoS(double kmin, double kmax, int calls){
+double Int_rhoS(double kmin, double kmax, double MEFF, int calls){
 	gsl_function RhoScalar;
 	RhoScalar.function = &rhoS;
-	RhoScalar.params = &mstar;
+	RhoScalar.params = &MEFF;
 
 	gsl_integration_workspace *WR = gsl_integration_workspace_alloc(calls);
 	double relerr=1e-7;
@@ -20,7 +20,7 @@ double Int_rhoS(double kmin, double kmax, int calls){
 double Int_Ekinetic(double kmin, double kmax, int calls){
 	gsl_function EK;
 
-	EK.function = &goko;
+	EK.function = &EKIN;
 	EK.params = &mstar;
 
 	gsl_integration_workspace * WE = gsl_integration_workspace_alloc(calls);
@@ -69,4 +69,3 @@ double Int_eye2(double kmin, double kmax, int calls){
 	
 	return Itwo;
 }
-

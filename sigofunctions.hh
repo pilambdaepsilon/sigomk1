@@ -15,7 +15,7 @@ const double pi = M_PI;						// Pie (yummm)
 const double MeVtoinvFM = 0.0008065*(2*pi);			// approximate conversion factor
 const double rho0 = 0.153;					// staturation density (fm^-3)
 double Kompress = 250*MeVtoinvFM;				// Compression modulus (fm^-1)
-double mass = 938*MeVtoinvFM;					// nucleon mass (fm^-1) 
+double mass = 939*MeVtoinvFM;					// nucleon mass (fm^-1) 
 double mstar = 0.75*mass;					// effective mass
 const double asymm = 32.5*MeVtoinvFM;				// symmetry energy coefficient (fm^-1)
 const double BperA = -16.3*MeVtoinvFM;				// Binding energy (fm^-1)
@@ -120,12 +120,12 @@ double Gsigma2(double RHO, double CONSTB, double CONSTC, double IONE, double kF)
 ===============================================================================================================*/
 double rhoS(double k, void *param){			//Scalar density Integrand
 	double Integrand = 0;
-	double m = *(double *) param;
+	double MEFF = *(double *) param;
 
 	double k2 = k*k;
-	double E = sqrt(k2 + m*m);
+	double E = sqrt(k2 + MEFF*MEFF);
 
-	Integrand = 2*k2*m/(pi*pi * E);
+	Integrand = 2*k2*MEFF/(pi*pi * E);
 	return Integrand;
 }
 
@@ -150,7 +150,7 @@ double I2(double k, void *param){			//relevant integral for solving set of eqns
 	return Integrand;
 }
 
-double goko(double k, void *param){			//Kinetic Energy Integrand-same form as I3
+double EKIN(double k, void *param){			//Kinetic Energy Integrand-same form as I3
 							//so use it in the integratori to solve for del3
 	double Integrand = 0;
 	double m = *(double *) param;
@@ -177,5 +177,3 @@ double eye3(double kF, double m){
 	double t = sqrt(1 + x*x);
 	return 1./(2*pi*pi) * pow(m, 4)*(-0.5*x*t + x*pow(t, 3) - 0.5*log(x+t));
 }
-	
-
