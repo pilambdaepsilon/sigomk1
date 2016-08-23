@@ -69,3 +69,22 @@ double Int_eye2(double kmin, double kmax, int calls){
 	
 	return Itwo;
 }
+
+double Int_eye3(double kmin, double kmax, int calls){
+	gsl_function EYE3;
+
+	EYE3.function = &I3;
+	EYE3.params = &mstar;
+
+	gsl_integration_workspace * WEYE = gsl_integration_workspace_alloc(calls);
+	double relerr0 = 1e-7;
+
+	double Ithree = 0;
+	double Ithreeerr = 0;
+
+	gsl_integration_qags(&EYE3, kmin, kmax, 0., relerr0, calls, WEYE, &Ithree, &Ithreeerr);
+	gsl_integration_workspace_free(WEYE);
+	
+	return Ithree;
+}
+

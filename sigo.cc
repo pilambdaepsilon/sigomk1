@@ -3,40 +3,31 @@
 int main(){
 	double KineticEnergy, EnergyDensity, Int1, Int2, Int3;			
 	double E0 = 0;	
-	double BaryonDensity = 0.0001;				//the one true var
+	double BaryonDensity = 0.0001;				//the one true variable
 	double ConstC, ConstB, GSIGMA, GOMEGA, GRHO;
 
-	ofstream DAT;						//my file
+	ofstream DAT;						//write data into this file
 	DAT.open("SigOm.dat");
 	ofstream DATCHECK;
 	DATCHECK.open("check.dat");
 
 	double drho = 0.001*rho0;
-	double Etest = 0;
 	double kFermi = 0;
-	double ScalarDMDensity = 0;
-	double DMDensity = 0;
-	double GCHI, GPI, DMmass, PImass;
-	double kFermi2 = 0;
-	double SRtest = 0;
-	double ScalarDensity = 0;
-	double NeutronDensity = 0;
-	double ProtonDensity = 0;
-	double BetaRatio = 0;
-	double DelMass = 0;
+	double ScalarDMDensity, DMDensity, GCHI, GPI, DMmass, PImass;
+	double ScalarDensity, NeutronDensity, ProtonDensity, BetaRatio, DelMass;
 	double EffMass = 0;
 	double EffMassPrime = mass;
 	double E01 = mass/MeVtoinvFM;
 	int calls = 1000;
+
 	cout << "Beta Ratio (Neutron Density - Proton Density)/Total Density: "; cin >> BetaRatio; cout << '\n';
 
 /*========== now use these to get the variable parameters ==================*/	
 	while (BaryonDensity <= 10*rho0){
 		kFermi = pow((6*pi*pi/4 *BaryonDensity), (1./3));
-		KineticEnergy = Int_Ekinetic(0, kFermi, calls);
 		Int1 = Int_eye1(0, kFermi, calls);
 		Int2 = Int_eye2(0, kFermi, calls);
-		Int3 = KineticEnergy;
+		Int3 = Int_eye3(0, kFermi, calls);
 
 		ConstC = C(BaryonDensity, Int1, Int2, Int3, kFermi);
 		ConstB = B(BaryonDensity, Int1, Int2, Int3, kFermi);
@@ -47,11 +38,11 @@ int main(){
 		for(int i = 0; i < 25; i++){
 			EffMass = EffMassPrime;
 			ScalarDensity = Int_rhoS(0, kFermi, EffMass, calls);
-			EffMassPrime = mass - GSIGMA * ScalarDensity*ScalarDensity;
+			EffMassPrime = mass - GSIGMA * ScalarDensity;
 			
 			// CHECK FOR CONVERGENCE OF EFFECTIVE MASS AND SCALAR DENSITY
 			if(DATCHECK.is_open()){
-				DATCHECK << i << " " << EffMassPrime << " " << ScalarDensity << '\n';	
+				DATCHECK << i << " " << EffMassPrime/mass << " " << ScalarDensity << '\n';	
 			}
 		}
 		DATCHECK.close();
@@ -62,15 +53,15 @@ int main(){
 		NeutronDensity = 0.5*(1+BetaRatio)*BaryonDensity;
 		ProtonDensity = 0.5*(1 - BetaRatio)*BaryonDensity;
 
-		double kFermiproton = pow((6*pi*pi/4* ProtonDensity), 1./3);
-		double kFermineutron = pow((6*pi*pi/4* NeutronDensity), 1./3);
+		double kFermiproton = pow((6.*pi*pi/4.* ProtonDensity), 1./3);
+		double kFermineutron = pow((6.*pi*pi/4.* NeutronDensity), 1./3);
 		double KineticEnergyProton = Int_Ekinetic(0, kFermiproton, calls);
 		double KineticEnergyNeutron = Int_Ekinetic(0, kFermineutron, calls);
 
 		EnergyDensity = 
-		KineticEnergyProton/(2.*BaryonDensity)
-		+ KineticEnergyNeutron/(2.*BaryonDensity)
-		+ 0.5* GOMEGA * BaryonDensity		
+		- KineticEnergyProton/(2.*BaryonDensity)
+		- KineticEnergyNeutron/(2.*BaryonDensity)
+		- 0.5* GOMEGA * BaryonDensity		
 		- 0.5* GRHO * pow((ProtonDensity - NeutronDensity), 2.)/BaryonDensity 
 		- 0.5*(GSIGMA)*pow(ScalarDensity, 2.)/BaryonDensity 
 		- (1./3.)*ConstB*mass*pow(DelMass, 3.)/BaryonDensity - (1./4.) * ConstC*pow(DelMass, 4.)/BaryonDensity;
@@ -83,8 +74,8 @@ int main(){
 		DAT <<							//0 
 		BaryonDensity<< " " << 					//1
 		(EnergyDensity)/MeVtoinvFM - E01 << " " << 		//2
-		sqrt(GSIGMA) << " " <<					//3
-		-sqrt(GOMEGA) << " " <<					//4
+		GSIGMA << " " <<					//3
+		GOMEGA << " " <<					//4
 		GRHO << " " <<						//5
 		GSIGMA*ScalarDensity<< " " << 				//6
 		-GOMEGA*BaryonDensity<< " " << 				//7

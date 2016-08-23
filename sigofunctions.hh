@@ -15,8 +15,8 @@ const double pi = M_PI;						// Pie (yummm)
 const double MeVtoinvFM = 0.0008065*(2*pi);			// approximate conversion factor
 const double rho0 = 0.153;					// staturation density (fm^-3)
 double Kompress = 250*MeVtoinvFM;				// Compression modulus (fm^-1)
-double mass = 939*MeVtoinvFM;					// nucleon mass (fm^-1) 
-double mstar = 0.75*mass;					// effective mass
+double mass = 938*MeVtoinvFM;					// nucleon mass (fm^-1) 
+double mstar = 0.7*mass;					// effective mass
 const double asymm = 32.5*MeVtoinvFM;				// symmetry energy coefficient (fm^-1)
 const double BperA = -16.3*MeVtoinvFM;				// Binding energy (fm^-1)
 
@@ -37,7 +37,7 @@ double alpha1(double RHO, double kF){
 	return a1;
 }
 double beta1(double RHO, double kF){
-	double b1 = 2*mass*pow((mass - mstar),2)*alpha1(RHO,kF);	
+	double b1 = 2*mass*(mass - mstar)*alpha1(RHO,kF);	
 	return b1;
 }
 double gamma1(double RHO, double kF){
@@ -59,10 +59,10 @@ double del3(double ITHREE){
 }
 
 double alpha2 = 0.5 * pow((mass - mstar),2);
-double beta2 = (1/3) * mass * pow((mass - mstar),3);
+double beta2 = (1./3.) * mass * pow((mass - mstar),3);
 double gamma2 = 0.25 * pow((mass - mstar),4);
 double del2(double RHO, double ITWO, double kF){
-	double d2 = RHO* (mass + BperA) - ITWO - 0.5 * Gomega2(RHO, kF) * pow(RHO,2);
+	double d2 = RHO* (mass + BperA) - ITWO - 0.5 * Gomega2(RHO, kF) * RHO*RHO;
 	return d2;
 }
 
@@ -82,8 +82,8 @@ double C(double RHO, double IONE, double ITWO, double ITHREE, double kF){
 	double ab31 = ( alpha3*beta1(RHO, kF) - alpha1(RHO, kF)*beta3 );
 	double ab21 = ( alpha2*beta1(RHO, kF) - alpha1(RHO, kF)*beta2 );
 
-	double cnumerator = ab31*ad21*ab21*ad31;
-	double cdenominator = ab31*ag21*ab21*ag31;
+	double cnumerator = -ab21*ad31 + ab31*ad21;
+	double cdenominator = -ab21*ag31 + ab31*ag21;
 
 	double c = cnumerator/cdenominator;
 	return c;
@@ -99,8 +99,8 @@ double B(double RHO, double IONE, double ITWO, double ITHREE, double kF){
 	double ab31 = ( alpha3*beta1(RHO, kF) - alpha1(RHO, kF)*beta3 );
 	double ab21 = ( alpha2*beta1(RHO, kF) - alpha1(RHO, kF)*beta2 );
 
-	double bnumerator = (ad21 - ag21)*C(RHO, IONE, ITWO, ITHREE, kF);
-	double bdenominator = ab21;
+	double bnumerator = -ad31 + ag31*C(RHO, IONE, ITWO, ITHREE, kF);
+	double bdenominator = -ab31;
 
 	double b = bnumerator/bdenominator;
 	return b;
@@ -140,6 +140,17 @@ double I1(double k, void *param){			//relevant integral for solving set of eqns
 }
 
 double I2(double k, void *param){			//relevant integral for solving set of eqns
+	double Integrand = 0;
+	double m = *(double *) param;
+	
+	double k2 = k*k;				//squared cuz ima lazy
+	double E = sqrt(k2 + m*m);			
+
+	Integrand = (2/(pi*pi)) * k2* E;
+	return Integrand;
+}
+
+double I3(double k, void *param){			//relevant integral for solving set of eqns
 	double Integrand = 0;
 	double m = *(double *) param;
 	
