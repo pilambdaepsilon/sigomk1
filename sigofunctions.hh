@@ -12,11 +12,13 @@ using namespace std;
 ==== Emperical Nuclear parameters - working in units of MeV and fm^-1 for energies and fm for distances ========
 ==============================================================================================================*/
 const double pi = M_PI;						// Pie (yummm)
-const double MeVtoinvFM = 0.0008065*(2*pi);			// approximate conversion factor
+const double MeVtoinvFM = 0.00506738;				// approximate conversion factor
 const double rho0 = 0.153;					// staturation density (fm^-3)
 double Kompress = 250*MeVtoinvFM;				// Compression modulus (fm^-1)
 double mass = 938*MeVtoinvFM;					// nucleon mass (fm^-1) 
-double mstar = 0.7*mass;					// effective mass
+double massOmega = 783*MeVtoinvFM;				// omega mass (fm^-1) 
+double massSigma = 550*MeVtoinvFM;				// approximate sigma mass (fm^-1) 
+double mstar = 0.75*mass;					// effective mass
 const double asymm = 32.5*MeVtoinvFM;				// symmetry energy coefficient (fm^-1)
 const double BperA = -16.3*MeVtoinvFM;				// Binding energy (fm^-1)
 
@@ -24,7 +26,8 @@ const double BperA = -16.3*MeVtoinvFM;				// Binding energy (fm^-1)
 ================================== Constant parameters at saturation ============================================
 ===============================================================================================================*/
 double Gomega2(double RHO, double kF){
-	double fieldstrength = (mass + BperA - sqrt(kF*kF + mstar * mstar))/RHO;	
+	double E = sqrt(kF*kF + mstar*mstar);
+	double fieldstrength = (mass + BperA - E)/RHO;	
 	return fieldstrength;
 }
 double Grho2(double RHO, double kF){
@@ -178,12 +181,12 @@ double eye1(double kF, double m){
 	return 2/(pi*pi) * m*m*(0.5*x*t + x/t - (1.5)*log(x+t));
 }
 	 
-double eye2(double kF, double m){
+double eye3(double kF, double m){
 	double x = kF/m;
 	double t = sqrt(1 + x*x);
 	return 1./(pi*pi) * pow(m, 3)*(x*t - log(x+t));
 }
-double eye3(double kF, double m){
+double eye2(double kF, double m){
 	double x = kF/m;
 	double t = sqrt(1 + x*x);
 	return 1./(2*pi*pi) * pow(m, 4)*(-0.5*x*t + x*pow(t, 3) - 0.5*log(x+t));

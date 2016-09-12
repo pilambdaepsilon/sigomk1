@@ -17,11 +17,11 @@ double Int_rhoS(double kmin, double kmax, double MEFF, int calls){
 	return RHOSC;
 } 
 
-double Int_Ekinetic(double kmin, double kmax, int calls){
+double Int_Ekinetic(double kmin, double kmax, double mst, int calls){
 	gsl_function EK;
 
 	EK.function = &EKIN;
-	EK.params = &mstar;
+	EK.params = &mst;
 
 	gsl_integration_workspace * WE = gsl_integration_workspace_alloc(calls);
 	double relerr0 = 1e-7;
