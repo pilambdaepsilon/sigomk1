@@ -14,7 +14,7 @@ using namespace std;
 const double pi = M_PI;						// Pie (yummm)
 const double MeVtoinvFM = 0.00506738;				// approximate conversion factor
 const double rho0 = 0.153;					// staturation density (fm^-3)
-double Kompress = 250*MeVtoinvFM;				// Compression modulus (fm^-1)
+double Kompress = 200*MeVtoinvFM;				// Compression modulus (fm^-1)
 double mass = 938*MeVtoinvFM;					// nucleon mass (fm^-1) 
 double massOmega = 783*MeVtoinvFM;				// omega mass (fm^-1) 
 double massSigma = 550*MeVtoinvFM;				// approximate sigma mass (fm^-1) 
@@ -89,6 +89,7 @@ double C(double RHO, double IONE, double ITWO, double ITHREE, double kF){
 	double cdenominator = -ab21*ag31 + ab31*ag21;
 
 	double c = cnumerator/cdenominator;
+	//c = 0;
 	return c;
 }
 
@@ -106,6 +107,7 @@ double B(double RHO, double IONE, double ITWO, double ITHREE, double kF){
 	double bdenominator = -ab31;
 
 	double b = bnumerator/bdenominator;
+//	b = 0;
 	return b;
 }
 
