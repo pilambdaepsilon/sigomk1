@@ -32,7 +32,7 @@ double clight = 3e10;						// cm/s
 const double Planckbar = 6.626e-30*convkgtoGeV;			// m^2*kg/s -> cm^2*GeV/s
 
 /*====================== EMPERICAL NS PARAMETERS =======================*/
-const double Msolar = 1.98e30*convkgtoGeV;	// mass of Sol in kg->GeV
+const double Msolar = 1.98892e30*convkgtoGeV;	// mass of Sol in kg->GeV
 const double rho_baryons = 5.7e11*convkgtoGeV;	// mean NS baryon mass density in kg/cm^3->GeV/cm^3
 double TNS = 1e5*convKtoGeV;					// NS temperature in K->GeV
 double TDM = TNS;
@@ -63,6 +63,7 @@ double radius3(double mDM, double mn, double t, double sigchin){
 	return sqrt(eta/t);
 }	
 
+/*============= ORIGINAL EVOLUTION =============*/
 double Nchi0(double Cc, double Cs, double time){
 	return Cc/Cs * (exp(Cs * time) - 1.);
 }
@@ -74,7 +75,7 @@ double tgeo(double mDM, double mred, double sigchin, double sigchi2, double Cc, 
 	while(time <= 1e10){
 		double rad = radius(mDM, mred, time, sigchin)/RNS;
 		double rfid = sqrt( Nchi0(Cc, Cs, time)* sigchi2/(pi * RNS *RNS));
-		if (rad <= 1.1*rfid && rad >= 0.9 *rfid ){
+		if (rad <= 1.01*rfid && rad >= 0.99 *rfid ){
 			tGEO = time;	
 		}
 		time *= 1.001;
@@ -82,21 +83,27 @@ double tgeo(double mDM, double mred, double sigchin, double sigchi2, double Cc, 
 	return tGEO;
 }
 double Nchigeo(double mDM, double mred, double geotime, double time, double sigchin, double sigchi2, double Cc, double Cs){
+	double eta = 8*pi*sqrt(2.) * pow(mred, 3.) * pow(CoreDens, 2.) * sigchin *RNS*RNS* Gnewton / (3*mDM * pFermi) * pow(clight, 0) * pow(Planckbar, 0)*.001;
 	double radgeo = radius(mDM, mred, geotime, sigchin);
 	double Ngeo = pi* pow(radgeo, 2)/sigchi2;
-	return Cc*time + Cs*Ngeo*geotime * log10(time);
+	return Cc*time + 2.*Cs*Ngeo*RNS/(pow(radgeo, 2)*eta) * sqrt(1 + eta*(time - T1));
 }
 
 
 /* ============ THERMALIZATION ===================*/
 double ttherm(double mDM, double mn, double mred, double sigchin){
-	return mDM*mDM*pFermi/(6*sqrt(2)*TNS*mn*mn*CoreDens*sigchin) * pow( (mn/mred), 3);
+	return mDM*mDM*pFermi/(6.*sqrt(2.)*kBoltzmann*TNS*mn*mn*CoreDens*sigchin) * pow( (mn/mred), 3);
 }
 double Nchitherm(double mDM, double mred, double thermtime, double time, double sigchin, double sigchi2, double Cc, double Cs){
 	double radtherm = radius(mDM, mred, thermtime, sigchin);
 	return (Cc + Cs*pi*pow(radtherm, 2)/sigchi2) * time;
 }
-
+double PauliBlocking(double mred){
+	double xi = 2.* sqrt(Gnewton*MNS/RNS)*mred;
+	if (xi < 1.){
+		return xi;}
+	else{ return 1.;}
+}
 
 /*============= MAIN  ================*/
 int main(){
@@ -122,7 +129,7 @@ int main(){
 	}
 
 	double ReducedMass = DMmass * Nmass/(DMmass + Nmass);
-	double CaptureRate = 9.19e22 * (SIGCHIN/1e-55) / DMmass * rhoDM;		//Capture rate using these parameters
+	double CaptureRate = 9.19e22 * (SIGCHIN/1e-55) / DMmass * rhoDM*PauliBlocking(ReducedMass);		//Capture rate using these parameters
 	double SelfCapture = 1.06e-3 * (SIGCHI2/1e-24) / DMmass * rhoDM;		//Self-capture rate using these parameters
 
 /*Core Density */
@@ -153,7 +160,7 @@ int main(){
 
 	vector<double> timevec (times, times+4);
 	double RTH = radius(DMmass, ReducedMass, TTHERM, SIGCHIN);
-	double RTHEST = sqrt(9.* kBoltzmann * TNS/(4.*pi*Gnewton*CoreDens*DMmass));
+	double RTHEST = sqrt(9.* kBoltzmann * TNS/(4.*pi*Gnewton*CoreDens*Nmass*DMmass));
 	double RTHEST2 = 334*sqrt(Nmass/DMmass);
 	cout << "containment time: " << T1 << '\n'
 		<< "thermalization time: " << TTHERM << '\n'
@@ -169,6 +176,7 @@ int main(){
 	t3 = timevec[2];
 	t4 = timevec[3];
 	double tprev = 0;
+	int count = 0;
 	while(TIME <= 1e11){
 		if (TIME < t1){
 			DMNOplus = 0;
@@ -177,9 +185,15 @@ int main(){
 		else if (TIME >= t1 && TIME < t2){
 			if(t1 == TGEO){
 				DMNOplus = Nchigeo(DMmass, ReducedMass, TGEO, TIME, SIGCHIN, SIGCHI2, CaptureRate, SelfCapture) - Nchigeo(DMmass, ReducedMass, TGEO, tprev, SIGCHIN, SIGCHI2, CaptureRate, SelfCapture);
+				if(count == 0){
+				cout << "T1: Geometric" << '\n';
+				count = 1;}
 			}
 			else if(t1 == TTHERM){
 				DMNOplus = Nchitherm(DMmass, ReducedMass, TTHERM, TIME, SIGCHIN, SIGCHI2, CaptureRate, SelfCapture) - Nchitherm(DMmass, Nmass, TTHERM, tprev, SIGCHIN, SIGCHI2, CaptureRate, SelfCapture);
+				if(count == 0){
+				cout << "T1: Thermalization" << '\n';
+				count = 1;}
 			}
 			else if(t1 == TMAX){
 				DMNOplus = 0;
@@ -187,15 +201,24 @@ int main(){
 			}
 			else{
 				DMNOplus = Nchi0(CaptureRate, SelfCapture, TIME) - Nchi0(CaptureRate, SelfCapture, tprev);
+				if(count == 0){
+				cout << "T1: Regular Evolution" << '\n';
+				count = 1;}
 			}
 		}
 
 		else if (TIME >= t2 && TIME < t3){
 			if(t2 == TGEO){
 				DMNOplus = Nchigeo(DMmass, ReducedMass, TGEO, TIME, SIGCHIN, SIGCHI2, CaptureRate, SelfCapture) - Nchigeo(DMmass, ReducedMass, TGEO, tprev, SIGCHIN, SIGCHI2, CaptureRate, SelfCapture);
+				if(count == 1){
+				cout << "T2: Geometric" << '\n';
+				count = 2;}
 			}
 			else if(t2 == TTHERM){
 				DMNOplus = Nchitherm(DMmass, ReducedMass, TTHERM, TIME, SIGCHIN, SIGCHI2, CaptureRate, SelfCapture) - Nchitherm(DMmass, Nmass, TTHERM, tprev, SIGCHIN, SIGCHI2, CaptureRate, SelfCapture);
+				if(count == 1){
+				cout << "T2: Thermalization" << '\n';
+				count = 2;}
 			}
 			else if(t2 == TMAX){
 				DMNOplus = 0;
@@ -203,6 +226,9 @@ int main(){
 			}
 			else{
 				DMNOplus = Nchi0(CaptureRate, SelfCapture, TIME) - Nchi0(CaptureRate, SelfCapture, tprev);
+				if(count == 1){
+				cout << "T2: Regular Evolution" << '\n';
+				count = 2;}
 			}
 		}
 
@@ -210,9 +236,15 @@ int main(){
 		else if (TIME >= t3 && TIME <t4){
 			if(t3 == TGEO){
 				DMNOplus = Nchigeo(DMmass, ReducedMass, TGEO, TIME, SIGCHIN, SIGCHI2, CaptureRate, SelfCapture) - Nchigeo(DMmass, ReducedMass, TGEO, tprev, SIGCHIN, SIGCHI2, CaptureRate, SelfCapture);
+				if(count == 2){
+				cout << "T3: Geometric" << '\n';
+				count = 3;}
 			}
 			else if(t3 == TTHERM){
 				DMNOplus = Nchitherm(DMmass, ReducedMass, TTHERM, TIME, SIGCHIN, SIGCHI2, CaptureRate, SelfCapture) - Nchitherm(DMmass, Nmass, TTHERM, tprev, SIGCHIN, SIGCHI2, CaptureRate, SelfCapture);
+				if(count == 2){
+				cout << "T3: Thermalization" << '\n';
+				count = 3;}
 			}
 			else if(t3 == TMAX){
 				DMNOplus = 0;
@@ -220,6 +252,9 @@ int main(){
 			}
 			else{
 				DMNOplus = Nchi0(CaptureRate, SelfCapture, TIME) - Nchi0(CaptureRate, SelfCapture, tprev);
+				if(count == 2){
+				cout << "T3: Regular Evolution" << '\n';
+				count = 3;}
 			}
 		}
 
@@ -238,7 +273,12 @@ int main(){
 		double DMDENS = DMNO/(Volumechi);			//DM number density in inverse fm^3
 		myfile << TIME << " " << DMNO << " " << DMDENS << " " << SIGCHIN << " " << SIGCHI2 << " " << DMmass << " " << Nchichandf << " " << Nchichandb << '\n';
 		tprev = TIME;
-		TIME *= 1.1;
+		if (TIME <= TGEO){
+			TIME *= 1.1;
+		}
+		else if(TIME > TGEO){
+			TIME *= 1.001;
+		}
 	}
 
 
@@ -261,7 +301,7 @@ int main(){
 
 		myfile3 << TIME-3.5 << " " << rad << " " << rfid << '\n';	
 //		cout << DMmass0 << ' ' << SIGCHIN << '\n';
-		TIME *= 1.1;
+		TIME *= 1.0001;
 
 	}
 	myfile3.close();
