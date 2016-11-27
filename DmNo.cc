@@ -22,8 +22,8 @@ int main(){
 		}
 	}
 	double ReducedMass = DMmass * Nmass/(DMmass + Nmass);
-	double CaptureRate = 9.19e22 * (SIGCHIN/1e-55) /DMmass;				//Capture rate using these parameters
-	double SelfCapture = 1.06e-3 * (SIGCHI2/1e-24) /DMmass;				//Self-capture rate using these parameters
+	double CaptureRate = 9.19e22 * (SIGCHIN/1e-55) /DMmass * rhoDM/pow(convinvGeVtocm, 3.);				//Capture rate using these parameters
+	double SelfCapture = 1.06e-3 * (SIGCHI2/1e-24) /DMmass * rhoDM/pow(convinvGeVtocm, 3.);				//Self-capture rate using these parameters
 
 /*======================= Core Density ========================================*/
 	double nbee = 3*MNS/(Nmass*4*pi*pow(RNS,3));
