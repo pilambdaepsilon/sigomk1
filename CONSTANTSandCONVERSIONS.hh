@@ -29,6 +29,3 @@ const double GNewton0 = (6.67408e-11)*1e6*pow(convcmtoinvGeV,3.)/(convkgtoGeV*po
 const double kBoltzmann0 = 1.3806e-23*1e4*pow(convcmtoinvGeV,2.)*convkgtoGeV/(pow(convstoinvGeV,2.)*convKtoGeV);	// natural, kB = 1
 const double clight0 = 3e8*1e2*convcmtoinvGeV/convstoinvGeV;								// natural, c = 1
 const double Planckbar0 = Planckbar*1e4*pow(convcmtoinvGeV,2)*convkgtoGeV/convstoinvGeV;				// natural, hBar = 1
-
-
-
