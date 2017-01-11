@@ -1,26 +1,109 @@
 #include "dmnofunc.hh"
+#include <vector>
 
 int main(){
-/*================== Pull in Cross-Sections and masses ====================*/
+/*================================================================================================================================================
+  _____  
+ |  __ | 
+ | |__)|
+ |  ___/ 
+ | |     
+ |_| ull in cross-sections and other relevant parameters from user input and from OPE code
+==================================================================================================================================================*/
+	double pr1 = 0;
+	double pr2 = 0;
+	double pr3 = 0;
+	double pr4 = 0;
+	double pr5 = 0;
+	double pr6 = 0;
+	double pr7 = 0;
+	double pr8 = 0;
+	double pr9 = 0;
+	double pr10 = 0;
+	double pr11 = 0;
+	double pr12 = 0;
+	double pr13 = 0;
+	double pr14 = 0;
+	double pr15 = 0;
+	double pr16 = 0;
+	double pr17 = 0;
+	double PARAMSET[16] = {0.0};
+
 	double DMmass = 0;
 	double powsigchin =0;
 	double powsigchi2 =0;
+	int MODE;
 	cout << '\n';
-	cout << "DM-Nucleon cross-section[order, cm^2]: "; cin >> powsigchin;
-	cout << "DM-DM cross-section[order, cm^2]: "; cin >> powsigchi2;
-	double SIGCHIN = pow(10., powsigchin);
-	double SIGCHI2 = pow(10., powsigchi2);
-	cout << "DM mass[GeV]: "; cin >> DMmass;
-	double DMmass0 = DMmass;
 
-	if (SIGCHI2/DMmass >= 2e-24){
-		while(SIGCHI2/DMmass >=  2e-24){
-			cout << '\n' << "Combination Breaks Bullet Cluster... Pick new ones" << '\n';
-			cout << "DM-DM cross-section[order, cm^2]: "; cin >> powsigchi2;
-			SIGCHI2 = pow(10., powsigchi2);
-			cout << "DM mass[GeV]: "; cin >> DMmass;
+	cout << "DM-Nucleon cross-section[order, cm^2]: "; cin >> powsigchin;
+	double SIGCHIN = pow(10., powsigchin);
+	cout << "MODE[1(USE OPE CODE), 2(INPUT BY HAND)]: "; cin >> MODE;
+	double SIGCHI2 = 0.0;
+
+	if (MODE == 2){
+		cout << "DM-DM cross-section[order, cm^2]: "; cin >> powsigchi2;
+		SIGCHI2 = pow(10., powsigchi2);
+		cout << "DM mass[GeV]: "; cin >> DMmass;
+
+		if (SIGCHI2/DMmass >= 2e-24){
+			while(SIGCHI2/DMmass >=  2e-24){
+				cout << '\n' << "Combination Breaks Bullet Cluster... Pick new ones" << '\n';
+				cout << "DM-DM cross-section[order, cm^2]: "; cin >> powsigchi2;
+				SIGCHI2 = pow(10., powsigchi2);
+				cout << "DM mass[GeV]: "; cin >> DMmass;
+			}
 		}
 	}
+
+
+	else if (MODE == 1){
+		cout << "DM mass[GeV]: "; cin >> DMmass;
+
+		ifstream dater;
+		dater.open("../../OPE/xsecs.dat");
+		if (!dater){
+			cout << "Can't find cross-sections file" << '\n';
+		}
+
+		while(!dater.eof()){
+			dater >> pr1 >> pr2 >> pr3 >> pr4 >> pr5 >> pr6 >> pr7 >> pr8 >> pr9 >> pr10 >> pr11 >> pr12 >> pr13 >> pr14 >> pr15 >> pr16 >> pr17;
+			if (pr1 == DMmass){
+				PARAMSET[0] = pr1;
+				PARAMSET[1] = pr2;
+				PARAMSET[2] = pr3;
+				PARAMSET[3] = pr4;
+				PARAMSET[4] = pr5;
+				PARAMSET[5] = pr6;
+				PARAMSET[6] = pr7;
+				PARAMSET[7] = pr8;
+				PARAMSET[8] = pr9;
+				PARAMSET[9] = pr10;
+				PARAMSET[10] = pr11;
+				PARAMSET[11] = pr12;
+				PARAMSET[12] = pr13;
+				PARAMSET[13] = pr14;
+				PARAMSET[14] = pr15;
+				PARAMSET[15] = pr16;
+			}
+		}
+		dater.close();
+		cout << '\n' << "====================== CROSS-SECTIONS at X GeV mass =========================" << '\n';
+		cout << "MASS: " << PARAMSET[0] << ' ';
+		for(int i = 1; i < 16; i++){
+			cout << PARAMSET[i] << ' ';
+		}
+		cout << '\n' << "===============================================================================" << '\n';
+		int OPNO = 0;
+		cout << "Corresponding to which operator? [1-15]: "; cin >> OPNO;
+		SIGCHI2 = PARAMSET[OPNO];
+		cout << "SIGCHI2 = " << SIGCHI2 << '\n';
+	}
+	else{
+		cout << "NO SUCH THING... EXITING... " << '\n' << '\n';
+		return 0;
+	}
+		
+	double DMmass0 = DMmass;
 	double ReducedMass = DMmass * Nmass/(DMmass + Nmass);
 	double CaptureRate = 9.19e22 * (SIGCHIN/1e-55) /DMmass * rhoDM/pow(convinvGeVtocm, 3.);				//Capture rate using these parameters
 	double SelfCapture = 1.06e-3 * (SIGCHI2/1e-24) /DMmass * rhoDM/pow(convinvGeVtocm, 3.);				//Self-capture rate using these parameters
@@ -39,13 +122,33 @@ int main(){
 	double DMNO = 0;
 	double DMNOplus = 0;
 	
-/*=========================== Calculate the Chandrasekhar Limits ==========================================*/
+
+
+/*================================================================================================================================================
+ _____ 
+/ ____|
+| |     
+| |     
+| |____ 
+ \_____| alculate the Chandrasekhar limit depending on wheter the DM is a boson or fermion
+==================================================================================================================================================*/
+
 	double chandpref = pow( (9./(32.*pi*pi)), 1./3.)*Planckbar*clight*5./3. /GNewton;
 	double Nchichand = pow( (chandpref/(DMmass*DMmass)), 3./2.);
 	double Nchichandf = 1.8e51*pow((100/DMmass), 3.);
 	double Nchichandb = 1.5e34*pow((100/DMmass), 2.);
 
-/*======================== Get the TIMESCALES ====================================================*/
+
+
+/*================================================================================================================================================
+   _____ 
+  / ____|
+ | |  __ 
+ | | |_ |
+ | |__| |
+  \_____| et the relevant timescales for DM capture in the NS
+==================================================================================================================================================*/
+
 	double TCONTAIN = tcon(DMmass, SIGCHIN);
 	if (TCONTAIN > 3.5){
 		TCONTAIN = 3.5;
@@ -55,6 +158,9 @@ int main(){
 	double times[4] = {TGEO, TTHERM, TCONTAIN, TMAX};
 	double t1, t2, t3 ,t4;
 	int counter = 0;
+	vector<double> UNSAFExsecschin;
+	vector<double> UNSAFEmasses;
+	vector<double> UNSAFExsecschi2;
 
 	vector<double> timevec (times, times+4);
 	double RTH = radius(DMmass, ReducedMass, TTHERM, SIGCHIN)/convcmtoinvGeV;
@@ -78,7 +184,18 @@ int main(){
 	double tprev = 0;
 	int count = 0;
 
-/*================== Calculate the number of particles by regime ================================*/
+
+
+/*================================================================================================================================================
+ _____ 
+/ ____|
+| |     
+| |     
+| |____ 
+\______| alculate the number of DM particles in the star by regime of capture
+==================================================================================================================================================*/
+	int chandcountb = 0;
+	int chandcountf = 0;
 	while(TIME <= TMAX){
 		if (TIME < t1){
 			DMNOplus = 0;
@@ -167,8 +284,16 @@ int main(){
 			}
 		}
 
-	
+			
 		DMNO += DMNOplus;
+		if (DMNO >= Nchichandb and chandcountb == 0){
+			cout << '\n' << "~~~([{BOSONIC CHANDRASEKHAR LIMIT REACHED!}])~~~" << '\n' << '\n';
+			chandcountb ++;
+		}
+		if (DMNO >= Nchichandf and chandcountf == 0){
+			cout << '\n' << "~~~([{FERMIONIC CHANDRASEKHAR LIMIT REACHED!}])~~~" << '\n' << '\n';
+			chandcountf ++;
+		}
 		double Rchi = radius(DMmass, ReducedMass, TIME, SIGCHIN)/convcmtoinvGeV*1e13;		//DM sphere radius in fm
 		double Volumechi = 4./3. *pi * pow(Rchi, 3.);
 		double DMDENS = DMNO/(Volumechi);			//DM number density in inverse fm^3
