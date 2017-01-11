@@ -10,6 +10,9 @@ const double convGeVtoK =1.16e13;
 const double convcmtoinvGeV = 5.06e13;
 const double convstoinvGeV = 1.52e24;
 
+const double convinvGeVtocm = 1.98e-14;
+const double convinvGeVtos = 6.58e-25;
+
 const double convkgtoGeV = 5.62e26;
 const double convinvcmtoGeV = 1.98e-14;
 const double convinvstoGeV = 6.58e-25;
