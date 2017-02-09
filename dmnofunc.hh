@@ -14,13 +14,13 @@
 const double Msolar = 1.98892e30*convkgtoGeV;						// mass of Sol in GeV
 double TNS = 1e5*convKtoGeV;								// NS temperature in K->GeV
 double TDM = TNS;
-double RNS = 10.6e5*convcmtoinvGeV;							// NS radius in cm->GeV^-1
-double MNS = 1.44*Msolar;								// NS mass in GeV
+double RNS = 11.914e5*convcmtoinvGeV;							// NS radius in cm->GeV^-1
+double MNS = 2.39*Msolar;								// NS mass in GeV
 double vbar = 220e5*convcmtoinvGeV/convstoinvGeV;					// mean thermal DM speed in cm/s->fraction of c - MB distrib
 double v2 = vbar*vbar;									// the square pops up more frequently
 const double Nmass = 0.94;								// Neutron mass in GeV
 const double rhoDM = 1./pow(convcmtoinvGeV,3.);						// GeV/cm^3 -> GeV^4 - mean DM density at 1 kpc from Galactic center
-const double rho_baryons = 5.7e11*convkgtoGeV/pow(convcmtoinvGeV, 3.);			// mean NS baryon mass density in kg/cm^3->GeV^4
+const double rho_baryons = 2.4911e12*convkgtoGeV/pow(convcmtoinvGeV, 3.);			// mean NS baryon mass density in kg/cm^3->GeV^4
 const double CoreDens = rho_baryons/(Nmass);						// mean NS baryon number density in GeV^3
 
 //double pFermi = Planckbar*pow((3*pi*pi*CoreDens), 1./3.)/clight;//GeV

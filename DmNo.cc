@@ -105,8 +105,12 @@ int main(){
 		
 	double DMmass0 = DMmass;
 	double ReducedMass = DMmass * Nmass/(DMmass + Nmass);
-	double CaptureRate = 9.19e22 * (SIGCHIN/1e-55) /DMmass * rhoDM/pow(convinvGeVtocm, 3.);				//Capture rate using these parameters
-	double SelfCapture = 1.06e-3 * (SIGCHI2/1e-24) /DMmass * rhoDM/pow(convinvGeVtocm, 3.);				//Self-capture rate using these parameters
+	
+	double CaptureRate = 9.52e-17*(GNewton0*MNS*RNS/(1.-2*GNewton0*MNS/RNS))  * (SIGCHIN/1e-55) /DMmass * rhoDM/pow(convinvGeVtocm, 3.);
+	double SelfCapture = 6.34e-4/(1. - 2*GNewton0*MNS/RNS)  * (SIGCHI2/1e-24) /DMmass * rhoDM/pow(convinvGeVtocm, 3.);
+
+//	double CaptureRate = 9.19e22 * (SIGCHIN/1e-55) /DMmass * rhoDM/pow(convinvGeVtocm, 3.);				//Capture rate using these parameters
+//	double SelfCapture = 1.06e-3 * (SIGCHI2/1e-24) /DMmass * rhoDM/pow(convinvGeVtocm, 3.);				//Self-capture rate using these parameters
 
 /*======================= Core Density ========================================*/
 	double nbee = 3*MNS/(Nmass*4*pi*pow(RNS,3));
@@ -115,7 +119,7 @@ int main(){
 	ofstream myfile;
 	ofstream myfile2;
 	ofstream myfile3;
-	myfile.open("nchi.dat");
+	myfile.open("nchi14.dat");
 	myfile2.open("Eboundcheck.dat");
 	myfile3.open("geotime.dat");
 	
@@ -196,6 +200,7 @@ int main(){
 ==================================================================================================================================================*/
 	int chandcountb = 0;
 	int chandcountf = 0;
+	TIME = 10;
 	while(TIME <= TMAX){
 		if (TIME < t1){
 			DMNOplus = 0;
